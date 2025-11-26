@@ -1,212 +1,245 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>theestudio25</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="icon" href="images/theestudios.jpeg">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        html {
-            scroll-behavior: smooth;
-            font-family: 'Playfair Display', serif;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Resume</title>
+
+<!-- Favicon (browser tab icon) -->
+<link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+
+<!-- Libraries for PDF export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; }
+.container { display: flex; flex-wrap: wrap; gap: 20px; max-width: 1200px; margin:auto; }
+.section { flex: 1; min-width: 300px; padding: 20px; border-radius: 10px; position: relative; }
+#input-section { border: 1px solid #ccc; }
+#resume-preview { 
+    border: 2px solid #333;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 10px auto;
+    background-color: #fff;
+    min-height: 600px;
+}
+input, textarea, select, button { width:100%; padding:8px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc; }
+button { background-color:#007bff; color:white; border:none; cursor:pointer; }
+button:hover { background-color:#0056b3; }
+.add-btn, .remove-btn { width:auto; margin:5px 0; }
+
+/* Flex layout for top section */
+.top-section { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:15px; padding:10px; border-bottom:1px solid #ccc; }
+#top-left { flex:1; min-width:200px; line-height:1.4; }
+#top-left p { margin:4px 0; }
+#top-left a { color:#007bff; text-decoration:none; }
+#top-left a:hover { text-decoration:underline; }
+#preview-photo img { border-radius:50%; width:100px; height:100px; display:block; margin-top:10px; }
+
+/* Section headings with dividers */
+#resume-preview h3 { border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-top: 20px; margin-bottom: 10px; }
+#resume-preview p { margin: 5px 0; }
+
+/* Template Styles */
+.template-A { font-family: Arial, sans-serif; color:#333; }
+.template-B { font-family: 'Courier New', monospace; color:#222; background-color:#f5f5f5; padding:15px; border-radius:8px; }
+
+/* Mobile responsive */
+@media(max-width:768px){ 
+  .top-section { flex-direction:column; align-items:flex-start; }
+  #preview-photo { margin:10px 0 20px 0; }
+}
+</style>
 </head>
+<body>
 
-<body class="bg-gradient-to-br from-pink-50 to-gray-50 text-gray-800">
-    <!-- Header Section (You can add it here) -->
-    <header class="text-center py-10">
-        <!-- Brand Logo Above "Theestudio" Text -->
-  <div class="text-center my-8">
-    <img src="images/theestudios.jpeg" alt="Thee Studios Logo" class="mx-auto w-32 h-32 object-contain">
+<div class="container">
+  <!-- Left Section: Inputs -->
+  <div id="input-section" class="section">
+    <h2>Enter Your Details</h2>
+    <label>Name:</label>
+    <input type="text" id="name" placeholder="Your Name">
+    <label>Email:</label>
+    <input type="email" id="email" placeholder="you@example.com">
+    <label>Phone:</label>
+    <input type="text" id="phone" placeholder="+91 1234567890">
+    <label>LinkedIn:</label>
+    <input type="url" id="linkedin" placeholder="https://linkedin.com/in/username">
+    <label>GitHub:</label>
+    <input type="url" id="github" placeholder="https://github.com/username">
+    <label>Objective:</label>
+    <textarea id="objective" placeholder="Write your career objective"></textarea>
+    <label>Schooling:</label>
+    <input type="text" id="school" placeholder="School Name and %">
+    <label>Degree:</label>
+    <input type="text" id="degree" placeholder="Degree and %">
+
+    <div id="projects-container">
+      <label>Projects:</label>
+      <div class="project-entry">
+        <input type="text" class="project-title" placeholder="Project Title">
+        <textarea class="project-desc" placeholder="Project Description"></textarea>
+      </div>
+    </div>
+    <button class="add-btn" onclick="addProject()">Add Project</button>
+    <button class="remove-btn" onclick="removeProject()">Remove Project</button>
+
+    <div id="internships-container">
+      <label>Internships:</label>
+      <div class="internship-entry">
+        <input type="text" class="internship-title" placeholder="Internship Title">
+        <textarea class="internship-desc" placeholder="Internship Description"></textarea>
+      </div>
+    </div>
+    <button class="add-btn" onclick="addInternship()">Add Internship</button>
+    <button class="remove-btn" onclick="removeInternship()">Remove Internship</button>
+
+    <div id="certifications-container">
+      <label>Certifications:</label>
+      <div class="certification-entry">
+        <input type="text" class="certification-title" placeholder="Certification Name">
+      </div>
+    </div>
+    <button class="add-btn" onclick="addCertification()">Add Certification</button>
+    <button class="remove-btn" onclick="removeCertification()">Remove Certification</button>
+
+    <label>Soft Skills / Declaration:</label>
+    <textarea id="softskills" placeholder="Enter soft skills or declaration"></textarea>
+
+    <label>Upload Photo:</label>
+    <input type="file" id="photo" accept="image/*">
+
+    <label>Background Color:</label>
+    <input type="color" id="theme" value="#ffffff">
+
+    <label>Choose Font:</label>
+    <select id="font-select">
+      <option value="Arial, sans-serif">Arial</option>
+      <option value="'Times New Roman', serif">Times New Roman</option>
+      <option value="'Courier New', monospace">Courier New</option>
+    </select>
+
+    <label>Choose Template:</label>
+    <select id="template">
+      <option value="template-A">Template A</option>
+      <option value="template-B">Template B</option>
+    </select>
+
+    <button id="export-btn">Export as PDF</button>
   </div>
-  <h1 class="text-5xl font-bold text-blue-600">Theestudio</h1>
 
-        <p class="text-lg text-pink-500 mt-2">Weddings | Engagements | Maternity | Baby Shoots| Pre-Wedding </p>
-    </header>
-<section id="video-bg" class="relative w-full h-[500px] overflow-hidden">
-    <video autoplay loop muted playsinline class="absolute top-0 left-0 w-full h-full object-cover z-0">
-      <source src="videos/wv.mp4" type="video/mp4">
-      Your browser does not support the video tag.
-    </video>
-    <div class="absolute z-10 flex items-center justify-center w-full h-full bg-black/50">
-      <h2 class="text-white text-4xl font-bold">Welcome to Thee Studios</h2>
+  <!-- Right Section: Resume Preview -->
+  <div id="resume-preview" class="section template-A">
+    <div class="top-section">
+      <div id="top-left">
+        <p><strong id="preview-name">Your Name</strong></p>
+        <p id="preview-email"><a href="#">Email</a></p>
+        <p id="preview-phone">Phone</p>
+        <p id="preview-linkedin"><a href="#" target="_blank">LinkedIn</a></p>
+        <p id="preview-github"><a href="#" target="_blank">GitHub</a></p>
+      </div>
+      <div id="preview-photo"></div>
     </div>
-  </section>
-  <section id="video-bg" class="relative w-full h-[500px] overflow-hidden">
-    <video autoplay loop muted playsinline class="absolute top-0 left-0 w-full h-full object-cover z-0">
-      <source src="videos/wv1.mp4" type="video/mp4">
-      Your browser does not support the video tag.
-    </video>
-    <div class="absolute z-10 flex items-center justify-center w-full h-full bg-black/50">
-      <h2 class="text-white text-4xl font-bold">Memories!</h2>
-    </div>
-  </section>
-  
-  
-      <!-- Add more videos as needed -->
-    </div>
-  </section>
-  
-    <!-- Photography Gallery Section -->
-    <section class="container mx-auto px-4 py-8">
-        <!-- Tag Navigation -->
-        <div class="text-center mb-8">
-            <h2 class="text-3xl font-bold mb-4">Services Available</h2>
-            <div>
-                <button id="weddingTag" class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition mx-2">Wedding</button>
-                <button id="engagementTag" class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition mx-2">Engagement</button>
-                <button id="maternityTag" class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition mx-2">Maternity</button>
-                <button id="babyTag" class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition mx-2">Baby</button>
-            </div>
-        </div>
 
-        <!-- Wedding Gallery -->
-        <div id="weddingGallery" class="gallery hidden">
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                <img src="images/wp1.jpeg" alt="Wedding Photo 1" class="rounded-xl shadow-md hover:scale-105 transition">
-                <img src="images/wp2.jpeg" alt="Wedding Photo 2" class="rounded-xl shadow-md hover:scale-105 transition">
-                <img src="images/wp3.jpeg" alt="Wedding Photo 3" class="rounded-xl shadow-md hover:scale-105 transition">
-                <img src="images/wp4.jpeg" alt="Wedding Photo 4" class="rounded-xl shadow-md hover:scale-105 transition">
-            </div>
-        </div>
-
-        <!-- Engagement Gallery -->
-        <div id="engagementGallery" class="gallery hidden">
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                <img src="images/ep2.jpeg" alt="Engagement Photo 1" class="rounded-xl shadow-md hover:scale-105 transition">
-                <img src="images/ep3.jpeg" alt="Engagement Photo 2" class="rounded-xl shadow-md hover:scale-105 transition">
-            </div>
-        </div>
-
-        <!-- Maternity Gallery -->
-        <div id="maternityGallery" class="gallery hidden">
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                <img src="images/mp1.jpeg" alt="Maternity Photo 1" class="rounded-xl shadow-md hover:scale-105 transition">
-                <img src="images/mp2.jpeg" alt="Maternity Photo 2" class="rounded-xl shadow-md hover:scale-105 transition">
-            </div>
-        </div>
-
-        <!-- Baby Photoshoot Gallery -->
-        <div id="babyGallery" class="gallery hidden">
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                <img src="images/bp1.jpeg" alt="Baby Photo 1" class="rounded-xl shadow-md hover:scale-105 transition">
-                <img src="images/bp2.jpeg" alt="Baby Photo 2" class="rounded-xl shadow-md hover:scale-105 transition">
-                <img src="images/bp3.jpeg" alt="Baby Photo 3" class="rounded-xl shadow-md hover:scale-105 transition">
-            </div>
-        </div>
-    </section>
-
-    <!-- JavaScript for Tag Switching -->
-    <script>
-        const weddingTag = document.getElementById('weddingTag');
-        const engagementTag = document.getElementById('engagementTag');
-        const maternityTag = document.getElementById('maternityTag');
-        const babyTag = document.getElementById('babyTag');
-
-        const weddingGallery = document.getElementById('weddingGallery');
-        const engagementGallery = document.getElementById('engagementGallery');
-        const maternityGallery = document.getElementById('maternityGallery');
-        const babyGallery = document.getElementById('babyGallery');
-
-        // Show Wedding Gallery
-        weddingTag.addEventListener('click', () => {
-            weddingGallery.classList.remove('hidden');
-            engagementGallery.classList.add('hidden');
-            maternityGallery.classList.add('hidden');
-            babyGallery.classList.add('hidden');
-        });
-
-        // Show Engagement Gallery
-        engagementTag.addEventListener('click', () => {
-            weddingGallery.classList.add('hidden');
-            engagementGallery.classList.remove('hidden');
-            maternityGallery.classList.add('hidden');
-            babyGallery.classList.add('hidden');
-        });
-
-        // Show Maternity Gallery
-        maternityTag.addEventListener('click', () => {
-            weddingGallery.classList.add('hidden');
-            engagementGallery.classList.add('hidden');
-            maternityGallery.classList.remove('hidden');
-            babyGallery.classList.add('hidden');
-        });
-
-        // Show Baby Photoshoot Gallery
-        babyTag.addEventListener('click', () => {
-            weddingGallery.classList.add('hidden');
-            engagementGallery.classList.add('hidden');
-            maternityGallery.classList.add('hidden');
-            babyGallery.classList.remove('hidden');
-        });
-    </script>
-
-    <!-- Contact Section -->
-    <section id="contact" class="bg-gray-100 py-12 px-4">
-        <div class="max-w-4xl mx-auto text-center">
-            <h2 class="text-4xl font-bold mb-6 text-gray-800">Get In Touch</h2>
-            <p class="text-gray-600 mb-8">I'd love to hear from you! Whether it's a wedding, maternity, or baby shoot—let’s create something beautiful together.</p>
-            <p class="text-gray-600 mb-8">Capture the moments with us!</p>
-            <div class="grid md:grid-cols-2 gap-6 text-left">
-                <a href="https://www.instagram.com/theestudio25/" target="_blank" class="inline-block px-6 py-3 bg-pink-600 text-white font-semibold rounded-lg hover:bg-pink-700 transition">
-                    📸 Visit Our Instagram
-                  </a>
-                  
-                <!-- Contact Info -->
-                <!-- Contact Info with Emojis -->
-<div class="space-y-4">
-    <div>
-        <h4 class="text-lg font-semibold text-gray-700">📧 Email</h4>
-        <p class="text-gray-600">theestudio25@gmail.com</p>
-    </div>
-    <div>
-        <h4 class="text-lg font-semibold text-gray-700">📱 Phone</h4>
-        <p class="text-gray-600">+91 8122356309</p>
-    </div>
-    <div>
-        <h4 class="text-lg font-semibold text-gray-700">📍 Location</h4>
-        <p class="text-gray-600">Chidamabaram, India</p>
-    </div>
+    <h3>Objective</h3>
+    <p id="preview-objective">Your career objective</p>
+    <h3>Education</h3>
+    <p id="preview-school">School</p>
+    <p id="preview-degree">Degree</p>
+    <h3>Projects</h3>
+    <div id="preview-projects"></div>
+    <h3>Internships</h3>
+    <div id="preview-internships"></div>
+    <h3>Certifications</h3>
+    <div id="preview-certifications"></div>
+    <h3>Soft Skills / Declaration</h3>
+    <p id="preview-softskills"></p>
+  </div>
 </div>
 
+<script>
+// Live preview updates
+const previewName = document.getElementById('preview-name');
+const previewEmail = document.getElementById('preview-email').querySelector('a');
+const previewPhone = document.getElementById('preview-phone');
+const previewLinkedin = document.getElementById('preview-linkedin').querySelector('a');
+const previewGithub = document.getElementById('preview-github').querySelector('a');
+const previewObjective = document.getElementById('preview-objective');
+const previewSchool = document.getElementById('preview-school');
+const previewDegree = document.getElementById('preview-degree');
+const previewProjects = document.getElementById('preview-projects');
+const previewInternships = document.getElementById('preview-internships');
+const previewCertifications = document.getElementById('preview-certifications');
+const previewSoftSkills = document.getElementById('preview-softskills');
+const previewPhoto = document.getElementById('preview-photo');
+const resumePreview = document.getElementById('resume-preview');
 
-                <!-- Contact Form -->
-                <form class="space-y-4 bg-white p-6 rounded-lg shadow-lg">
-                    <div>
-                        <label class="block text-gray-700 font-medium">Name</label>
-                        <input type="text" class="w-full border border-gray-300 p-2 rounded-md" required>
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-medium">Mail_Id</label>
-                        <input type="email" class="w-full border border-gray-300 p-2 rounded-md" required>
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-medium">Function Date</label>
-                        <input type="email" class="w-full border border-gray-300 p-2 rounded-md" required>
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-medium">Message</label>
-                        <textarea class="w-full border border-gray-300 p-2 rounded-md" rows="4" required></textarea>
-                    </div>
-                    <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition">Send Message</button>
-                </form>
-            </div>
-        </div>
-    </section>
-    <section id="video-bg" class="relative w-full h-[500px] overflow-hidden">
-        <video autoplay loop muted playsinline class="absolute top-0 left-0 w-full h-full object-cover z-0">
-          <source src="videos/wv2.mp4" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-        <div class="absolute z-10 flex items-center justify-center w-full h-full bg-black/50">
-          <h2 class="text-white text-4xl font-bold">Capture the moments!</h2>
-        </div>
-      </section>
-      
+document.getElementById('name').addEventListener('input', e => previewName.textContent = e.target.value);
+document.getElementById('email').addEventListener('input', e => { previewEmail.textContent = e.target.value; previewEmail.href='mailto:'+e.target.value; });
+document.getElementById('phone').addEventListener('input', e => previewPhone.textContent = e.target.value);
+document.getElementById('linkedin').addEventListener('input', e => { previewLinkedin.textContent=e.target.value; previewLinkedin.href=e.target.value; });
+document.getElementById('github').addEventListener('input', e => { previewGithub.textContent=e.target.value; previewGithub.href=e.target.value; });
+document.getElementById('objective').addEventListener('input', e => previewObjective.textContent = e.target.value);
+document.getElementById('school').addEventListener('input', e => previewSchool.textContent = e.target.value);
+document.getElementById('degree').addEventListener('input', e => previewDegree.textContent = e.target.value);
+document.getElementById('softskills').addEventListener('input', e => previewSoftSkills.textContent = e.target.value);
+
+// Photo preview
+document.getElementById('photo').addEventListener('change', function(){
+    const file = this.files[0];
+    if(file){
+        const reader = new FileReader();
+        reader.onload = function(e){
+            previewPhoto.innerHTML = `<img src="${e.target.result}" alt="Profile Photo">`;
+        }
+        reader.readAsDataURL(file);
+    }
+});
+
+// Theme, font, template changes
+document.getElementById('theme').addEventListener('input', function(){ resumePreview.style.backgroundColor = this.value; });
+document.getElementById('font-select').addEventListener('change', function(){ resumePreview.style.fontFamily = this.value; });
+document.getElementById('template').addEventListener('change', function(){ resumePreview.className = `section ${this.value}`; });
+
+// Projects
+function updateProjectsPreview(){
+    previewProjects.innerHTML = '';
+    document.querySelectorAll('.project-entry').forEach(entry => {
+        const title = entry.querySelector('.project-title').value;
+        const desc = entry.querySelector('.project-desc').value;
+        if(title || desc) previewProjects.innerHTML += `<p><strong>${title}</strong>: ${desc}</p>`;
+    });
+}
+function addProject(){ const container=document.getElementById('projects-container'); const div=document.createElement('div'); div.className='project-entry'; div.innerHTML=`<input type="text" class="project-title" placeholder="Project Title"><textarea class="project-desc" placeholder="Project Description"></textarea>`; container.appendChild(div); div.querySelectorAll('input, textarea').forEach(el=>el.addEventListener('input', updateProjectsPreview)); }
+function removeProject(){ const container=document.getElementById('projects-container'); if(container.children.length>1) container.removeChild(container.lastElementChild); updateProjectsPreview(); }
+document.querySelectorAll('.project-entry input, .project-entry textarea').forEach(el=>el.addEventListener('input', updateProjectsPreview));
+
+// Internships
+function updateInternshipsPreview(){ previewInternships.innerHTML=''; document.querySelectorAll('.internship-entry').forEach(entry=>{ const title=entry.querySelector('.internship-title').value; const desc=entry.querySelector('.internship-desc').value; if(title||desc) previewInternships.innerHTML+=`<p><strong>${title}</strong>: ${desc}</p>`; }); }
+function addInternship(){ const container=document.getElementById('internships-container'); const div=document.createElement('div'); div.className='internship-entry'; div.innerHTML=`<input type="text" class="internship-title" placeholder="Internship Title"><textarea class="internship-desc" placeholder="Internship Description"></textarea>`; container.appendChild(div); div.querySelectorAll('input,textarea').forEach(el=>el.addEventListener('input',updateInternshipsPreview)); }
+function removeInternship(){ const container=document.getElementById('internships-container'); if(container.children.length>1) container.removeChild(container.lastElementChild); updateInternshipsPreview(); }
+
+// Certifications
+function updateCertificationsPreview(){ previewCertifications.innerHTML=''; document.querySelectorAll('.certification-entry').forEach(entry=>{ const title=entry.querySelector('.certification-title').value; if(title) previewCertifications.innerHTML+=`<p>${title}</p>`; }); }
+function addCertification(){ const container=document.getElementById('certifications-container'); const div=document.createElement('div'); div.className='certification-entry'; div.innerHTML=`<input type="text" class="certification-title" placeholder="Certification Name">`; container.appendChild(div); div.querySelector('input').addEventListener('input',updateCertificationsPreview); }
+function removeCertification(){ const container=document.getElementById('certifications-container'); if(container.children.length>1) container.removeChild(container.lastElementChild); updateCertificationsPreview(); }
+
+// PDF export
+document.getElementById('export-btn').addEventListener('click',()=>{
+    html2canvas(resumePreview, { scale:2 }).then(canvas=>{
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p','mm','a4');
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        pdf.addImage(imgData,'PNG',0,0,pdfWidth,pdfHeight);
+        pdf.save('resume.pdf');
+    });
+});
+</script>
 
 </body>
 </html>
